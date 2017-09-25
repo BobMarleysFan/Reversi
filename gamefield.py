@@ -16,12 +16,11 @@ class Field:
         self._field[half_side_length][half_side_length - 1] = CellState.BLACK
 
     @property
-    def field(self):
-        return self._field
-
-    @property
     def side_length(self):
         return self._side_length
+
+    def __getitem__(self, item):
+        return self._field[item]
 
     def check_coords(self, coords):
         if len(coords) != 2:
@@ -29,33 +28,33 @@ class Field:
         return coords[0] < self._side_length and coords[1] < self._side_length \
             and self._field[coords[0]][coords[1]] == CellState.EMPTY
 
-    def get_inverting_instructions(self, coords, is_players_turn):
-        """"Возвращает список инструкций для инвертирования фишек в направлениях от клетки поля."""
-        chip_to_place, opponents_chip = (CellState.BLACK, CellState.WHITE) \
-            if is_players_turn else (CellState.WHITE, CellState.BLACK)
+    def get_flip_instructions(self, coords, disk_color):
+        """Возвращает список инструкций вида "(направление, количество)" для переворачивания фишек."""
+        opponent_color = CellState(int(not disk_color.value))
         instructions = []
-        for dx in [-1, 0, 1]:
-            for dy in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            for dx in [-1, 0, 1]:
                 mult = 1
-                chips_to_invert_count = 0
-                while 0 <= dx*mult + coords[0] < self.side_length \
-                    and 0 <= dy*mult + coords[0] < self.side_length \
-                    and not (dx == 0 and dy == 0):
-                        new_x = dx*mult+coords[0]
-                        new_y = dy*mult+coords[1]
-                        if self._field[new_x][new_y] == chip_to_place and chips_to_invert_count > 0:
-                            instructions.append((dx, dy, chips_to_invert_count))
-                            break
-                        elif self._field[new_x][new_y] == opponents_chip:
-                            chips_to_invert_count += 1
-                        else:
-                            break
+                disks_to_flip_count = 0
+                new_x = dx * mult + coords[0]
+                new_y = dy * mult + coords[1]
+                while 0 <= new_x < self.side_length \
+                        and 0 <= new_y < self.side_length \
+                        and not (dx == 0 and dy == 0):
+                    if self._field[new_x][new_y] == opponent_color:
+                        disks_to_flip_count += 1
                         mult += 1
+                        new_x = dx * mult + coords[0]
+                        new_y = dy * mult + coords[1]
+                    elif self._field[new_x][new_y] == disk_color and disks_to_flip_count > 0:
+                        instructions.append((dx, dy, disks_to_flip_count))
+                        break
+                    else:
+                        break
         return instructions
 
 
 class CellState(Enum):
-    EMPTY = 0
-    WHITE = 1
-    BLACK = 2
-
+    WHITE = 0
+    BLACK = 1
+    EMPTY = 2
