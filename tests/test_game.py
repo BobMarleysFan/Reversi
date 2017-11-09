@@ -1,21 +1,23 @@
+import sys
 import unittest
-from reversi import gamefield, game
-from reversi.gamefield import Field, DiskType
+
+sys.path.append(r"C:\Users\MK\PycharmProjects\Reversi")
 from reversi.game import GameState
+from reversi.gamefield import Field, DiskType
 
 
 class TestGame(unittest.TestCase):
     def test_properties(self):
         field = Field(6)
-        game = GameState(field, DiskType.WHITE, True)
+        game = GameState(field, DiskType.WHITE, "pvp", 2, 2)
         self.assertEqual(game.field, field)
         self.assertEqual(game.current_player, DiskType.WHITE)
         self.assertEqual(game.white_count, 2)
         self.assertEqual(game.black_count, 2)
-        self.assertEqual(game.is_pvp, True)
+        self.assertEqual(game.mode, "pvp")
 
     def test_place_and_flip_disk(self):
-        game = GameState(Field(4), DiskType.BLACK, False)
+        game = GameState(Field(4), DiskType.BLACK, "pve", 2, 2)
         game.place_or_flip_disk(1, 0)
         self.assertEqual([DiskType.BLACK, DiskType.WHITE, DiskType.BLACK, DiskType.NONE], game.field[1])
         game.place_or_flip_disk(1, 0)
