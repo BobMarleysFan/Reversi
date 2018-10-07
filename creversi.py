@@ -9,14 +9,14 @@ from reversi.gamefield import DiskType
 LOGGER = logging.getLogger("creversi")
 
 CELL_PRINTER = {
-    gamefield.DiskType.NONE: '.',
-    gamefield.DiskType.WHITE: '@',
-    gamefield.DiskType.BLACK: 'O'
+    DiskType.NONE: '.',
+    DiskType.WHITE: '@',
+    DiskType.BLACK: 'O'
 }
 
 MODE_RE = re.compile('[pe]v[pe]')
 
-__author__ = "Alexander Sanochkin"
+__author__ = "Alexander Sanochkin (player_number4@mail.ru)"
 
 
 def print_field(game_state):
@@ -49,7 +49,7 @@ class Commands:
         return self._driver
 
     def cmd_place_disk(self, *coords):
-        if not self.driver.make_turn((int(coords[0]) - 1, int(coords[1]) - 1)):
+        if not self.driver.try_make_turn((int(coords[0]) - 1, int(coords[1]) - 1)):
             print("Invalid move!")
         else:
             if self.game_state.check_end_game():
@@ -118,13 +118,14 @@ def parse_args():
                                      epilog="Author: {}".format(__author__))
     parser.add_argument("-n", "--new", help="new game", nargs=2, metavar=("side", "mode"))
     parser.add_argument("-l", "--load", help="load game", type=str, metavar="filename")
+    parser.add_argument("-d", "--debug", action="store_true")
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    logger = logging.getLogger("creversi")
-    logging.basicConfig(filename="creversi.log", level=logging.INFO)
+    logging.basicConfig(filename="creversi.log", level=logging.DEBUG if args.debug else logging.WARNING,
+                        format="[%(asctime)s] %(level)s:%(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     if args.new:
         start_game(Commands(driver.GameDriver(
             field=gamefield.Field(side_length=int(args.new[0])),

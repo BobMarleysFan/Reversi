@@ -21,9 +21,7 @@ class GameDriver:
         LOGGER.info("Starting new game in {} mode.".format(mode))
         self._game_state = game.GameState(field,
                                           current_player,
-                                          mode,
-                                          white_count,
-                                          black_count)
+                                          mode)
         self._states = []
         self._redo = []
 
@@ -31,9 +29,7 @@ class GameDriver:
         LOGGER.info("Starting new game in {} mode.".format(mode))
         self._game_state = game.GameState(gamefield.Field(field_side_length),
                                           gamefield.DiskType.BLACK,
-                                          mode,
-                                          white_count=2,
-                                          black_count=2)
+                                          mode)
         self._states = []
         self._redo = []
 
@@ -66,7 +62,7 @@ class GameDriver:
         LOGGER.info("Loaded game {}.".format(filename))
         return GameDriver(field, current_player, mode, white_count, black_count)
 
-    def make_turn(self, coords):
+    def try_make_turn(self, coords):
         state = copy.deepcopy(self._game_state)
         if self.game.make_turn(coords):
             LOGGER.info("Player placed {} disk on {} {}.".format(self._game_state.other_player,
@@ -85,8 +81,8 @@ class GameDriver:
                     possible_turns.append(turn)
         random_turn = possible_turns[random.randrange(len(possible_turns))]
 
-        LOGGER.fatal("Computer placed {} disk on {} {}.".format(self._game_state.current_player,
-                                                                *random_turn[0]))
+        LOGGER.info("Computer placed {} disk on {} {}.".format(self._game_state.current_player,
+                                                               *random_turn[0]))
         self.game.make_turn(*random_turn)
 
     def undo_turn(self):

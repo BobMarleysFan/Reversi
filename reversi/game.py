@@ -6,12 +6,13 @@ import logging
 LOGGER = logging.getLogger("reversi.game")
 
 class GameState:
-    def __init__(self, field, current_player, mode, white_count, black_count):
+    def __init__(self, field, current_player, mode):
         self._field = field
         self._current_player = current_player
         self._other_player = gamefield.DiskType(int(not self.current_player.value))
         self._mode = mode
-        self._white_count, self._black_count = (white_count, black_count)
+        self._white_count = field.get_white_disks_count()
+        self._black_count = field.get_black_disks_count()
         self._gameover = False
 
     @property
@@ -76,8 +77,8 @@ class GameState:
         self._field[coords[0]][coords[1]] = self._current_player
 
     def remove_disk(self, *coords):
-        if not self.field[coords[0][coords[1]]] == gamefield.DiskType.NONE:
-            if self.field[coords[0][coords[1]]] == gamefield.DiskType.WHITE:
+        if not self.field[coords[0]][coords[1]] == gamefield.DiskType.NONE:
+            if self.field[coords[0]][coords[1]] == gamefield.DiskType.WHITE:
                 self._white_count -= 1
             else:
                 self._black_count -= 1

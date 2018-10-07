@@ -29,7 +29,7 @@ class Field:
         if len(coords) != 2:
             return False
         return coords[0] < self._side_length and coords[1] < self._side_length \
-            and self._field[coords[0]][coords[1]] == DiskType.NONE
+               and self._field[coords[0]][coords[1]] == DiskType.NONE
 
     def get_flip_instructions(self, coords, disk_color):
         """Возвращает список инструкций вида "(направление, количество)" для переворачивания фишек."""
@@ -56,6 +56,20 @@ class Field:
                         break
         return instructions
 
+    def get_disks_count_by_color(self, color):
+        disks_count = 0
+        for row in self._field:
+            for cell in row:
+                if cell == color:
+                    disks_count += 1
+        return disks_count
+
+    def get_white_disks_count(self):
+        return self.get_disks_count_by_color(DiskType.WHITE)
+
+    def get_black_disks_count(self):
+        return self.get_disks_count_by_color(DiskType.BLACK)
+
     def __str__(self):
         return ":".join("".join(list(map(lambda disk: str(disk.value),
                                          self._field[x]))) for x in range(self._side_length))
@@ -76,6 +90,13 @@ class DiskType(Enum):
     WHITE = 0
     BLACK = 1
     NONE = 2
+    COMMON = 3
 
     def __str__(self):
         return str.lower(self.name)
+
+    @staticmethod
+    def get_opposite_type(type):
+        if type == DiskType.NONE or type == DiskType.COMMON:
+            return type
+        return DiskType.BLACK if type == DiskType.WHITE else DiskType.WHITE
